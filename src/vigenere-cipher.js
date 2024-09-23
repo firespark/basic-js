@@ -22,7 +22,7 @@ const { NotImplementedError } = require('../extensions/index.js');
 class VigenereCipheringMachine {
 
   constructor(direct = true) {
-    this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    //this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     this.direct = direct;
   }
 
@@ -41,9 +41,7 @@ class VigenereCipheringMachine {
 
     for (let i = 0; i < text.length; i++) {
       if((/[A-Z]/g).test(text[i])) {
-        let newAlphabet = this.createNewAlphabet(cipherKey[keyIndex]);
-
-        str += this.getCipherSymbol(text[i], newAlphabet);
+        str += this.getCipherSymbol(text[i], cipherKey[keyIndex], true);
         keyIndex++;
       }
       else {
@@ -70,9 +68,7 @@ class VigenereCipheringMachine {
 
     for (let i = 0; i < text.length; i++) {
       if((/[A-Z]/g).test(text[i])) {
-        let newAlphabet = this.createNewAlphabet(cipherKey[keyIndex]);
-
-        str += this.getDeCipherSymbol(text[i], newAlphabet);
+        str += this.getCipherSymbol(text[i], cipherKey[keyIndex], false);
         keyIndex++;
       }
       else {
@@ -101,7 +97,7 @@ class VigenereCipheringMachine {
       return symbol + parts[1] + parts[0];
   }
 
-  getCipherSymbol(symbol, newAlphabet) {
+  /* getCipherSymbol(symbol, newAlphabet) {
       const symbolKey = Object.keys(this.alphabet).find(k => this.alphabet[k] === symbol);
       return newAlphabet[symbolKey];
   }
@@ -109,7 +105,26 @@ class VigenereCipheringMachine {
   getDeCipherSymbol(symbol, newAlphabet) {
     const symbolKey = Object.keys(newAlphabet).find(k => newAlphabet[k] === symbol);
     return this.alphabet[symbolKey];
-}
+  } */
+    getCipherSymbol(symbol, keySymbol, encrypt = true) {
+		
+      const alphabetLength = 26;
+      const alphabetStart = 'A'.charCodeAt(0); 
+
+      const symbolCode = symbol.charCodeAt(0);
+
+      const shiftAmount = keySymbol.charCodeAt(0) - alphabetStart;
+      
+
+      if (encrypt) {
+        return String.fromCharCode(((symbolCode - alphabetStart + shiftAmount) % alphabetLength) + alphabetStart);
+        
+      } else {
+        return String.fromCharCode(((symbolCode - alphabetStart - shiftAmount + alphabetLength) % alphabetLength) + alphabetStart);
+        
+      }
+	  }
+  
 }
 
 module.exports = {
