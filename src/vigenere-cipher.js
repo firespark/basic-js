@@ -20,14 +20,96 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  constructor(direct = true) {
+    this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    this.direct = direct;
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  encrypt(text, key) {
+    if (!text || !key) {
+      throw new Error('Incorrect arguments!');
+    }
+
+    text = text.toUpperCase();
+    key = key.toUpperCase();
+    
+    let cipherKey = this.createKeyStr(text, key);
+
+    let str = '';
+    let keyIndex = 0;
+
+    for (let i = 0; i < text.length; i++) {
+      if((/[A-Z]/g).test(text[i])) {
+        let newAlphabet = this.createNewAlphabet(cipherKey[keyIndex]);
+
+        str += this.getCipherSymbol(text[i], newAlphabet);
+        keyIndex++;
+      }
+      else {
+        str += text[i];
+      }
+        
+    }
+
+    return this.direct ? str : str.split('').reverse().join('');
+
   }
+  decrypt(text, key) {
+    if (!text || !key) {
+      throw new Error('Incorrect arguments!');
+    }
+    text = text.toUpperCase();
+    //text = this.direct ? text : text.split('').reverse().join('');
+    key = key.toUpperCase();
+    
+    let cipherKey = this.createKeyStr(text, key);
+
+    let str = '';
+    let keyIndex = 0;
+
+    for (let i = 0; i < text.length; i++) {
+      if((/[A-Z]/g).test(text[i])) {
+        let newAlphabet = this.createNewAlphabet(cipherKey[keyIndex]);
+
+        str += this.getDeCipherSymbol(text[i], newAlphabet);
+        keyIndex++;
+      }
+      else {
+        str += text[i];
+      }
+        
+    }
+    return this.direct ? str : str.split('').reverse().join('');
+  }
+
+  createKeyStr(text, key) {
+
+    const repeater = Math.trunc(text.length / key.length)
+    const tail = text.length % key.length;
+    let str = key.repeat(repeater);
+
+    for (let i = 0; i < tail; i++) {
+        str += key[i];
+    }
+
+    return str;
+  }
+
+  createNewAlphabet(symbol) {
+      const parts = this.alphabet.split(symbol);
+      return symbol + parts[1] + parts[0];
+  }
+
+  getCipherSymbol(symbol, newAlphabet) {
+      const symbolKey = Object.keys(this.alphabet).find(k => this.alphabet[k] === symbol);
+      return newAlphabet[symbolKey];
+  }
+
+  getDeCipherSymbol(symbol, newAlphabet) {
+    const symbolKey = Object.keys(newAlphabet).find(k => newAlphabet[k] === symbol);
+    return this.alphabet[symbolKey];
+}
 }
 
 module.exports = {
